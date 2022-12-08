@@ -1,0 +1,81 @@
+plugins {
+	id 'fabric-loom' version '1.+'
+	id 'maven-publish'
+}
+
+version = 'fabric-1.0.0'
+group = 'dev.cheos'
+archivesBaseName = 'libhud'
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+
+dependencies {
+	minecraft 'com.mojang:minecraft:1.19.3'
+	mappings loom.officialMojangMappings()
+	modImplementation 'net.fabricmc:fabric-loader:0.14.11'
+
+	modCompileOnly 'net.fabricmc.fabric-api:fabric-api:0.68.1+1.19.3'
+}
+
+processResources {
+	inputs.property 'version', project.version
+
+	filesMatching('fabric.mod.json') {
+		expand 'version': project.version
+	}
+}
+
+java {
+	withSourcesJar()
+}
+
+jar {
+	from('LICENSE') {
+		rename { "${it}_${project.archivesBaseName}"}
+	}
+}
+
+loom {
+	runs {
+		client {
+			environment = 'client'
+			configName = 'runLibhudClient-fabric-1.19'
+			runDir = 'run/client'
+			source = sourceSets.main
+			ideConfigGenerated = true
+
+			client()
+		}
+	}
+
+	mixin {
+		defaultRefmapName = 'libhud.refmap.json'
+	}
+
+	decompilers {
+		fernflower {
+			memory = 16384L
+			maxThreads = 12
+		}
+	}
+
+	interfaceInjection {
+		enableDependencyInterfaceInjection = true
+	}
+}
+
+// publishing {
+// 	publications {
+// 		mavenJava(MavenPublication) {
+// 			from components.java
+// 		}
+// 	}
+
+// 	// See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
+// 	repositories {
+// 		// Add repositories to publish to here.
+// 		// Notice: This block does NOT have the same function as the block in the top level.
+// 		// The repositories here will be used for publishing your artifact, not for
+// 		// retrieving dependencies.
+// 	}
+// }
