@@ -23,6 +23,7 @@
       "dev.cheos.libhud.Libhud::client"
     ]
   },
+  "accessWidener": "libhud.accesswidener",
   "mixins": [
     "libhud.mixins.json"
   ],

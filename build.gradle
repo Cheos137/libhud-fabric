@@ -36,6 +36,8 @@ jar {
 }
 
 loom {
+	accessWidenerPath = file('src/main/resources/libhud.accesswidener')
+
 	runs {
 		client {
 			environment = 'client'
