@@ -17,6 +17,13 @@ dependencies {
 	modCompileOnly 'net.fabricmc.fabric-api:fabric-api:0.68.1+1.19.3'
 }
 
+sourceSets {
+	test {
+		// java { srcDirs += sourceSets.main.allJava }
+		// resources { srcDirs += sourceSets.main.resources }
+	}
+}
+
 processResources {
 	inputs.property 'version', project.version
 
@@ -47,6 +54,13 @@ loom {
 			ideConfigGenerated = true
 
 			client()
+		}
+
+		test {
+			inherit client
+			
+			configName = 'runLibhudClientTEST-fabric-1.19'
+			source = sourceSets.test
 		}
 	}
 

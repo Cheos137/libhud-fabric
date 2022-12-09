@@ -40,6 +40,7 @@ public class LibhudGui extends Gui {
 		Window window = this.minecraft.getWindow();
 		this.screenWidth = window.getGuiScaledWidth();
 		this.screenHeight = window.getGuiScaledHeight();
+		this.leftOffset = this.rightOffset = 39;
 		Font font = this.getFont();
 		RenderSystem.enableBlend();
 		
@@ -205,7 +206,7 @@ public class LibhudGui extends Gui {
 		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 	}
 	
-	private void setup() {
+	public void setup() {
 		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 		RenderSystem.setShader(GameRenderer::getPositionTexShader);
 		RenderSystem.setShaderTexture(0, GUI_ICONS_LOCATION);
@@ -219,7 +220,7 @@ public class LibhudGui extends Gui {
 	protected void renderArmor(PoseStack poseStack) {
 		Player player = getCameraPlayer();
 		if (player == null) return;
-		if (this.minecraft.gameMode.canHurtPlayer()) return;
+		if (!this.minecraft.gameMode.canHurtPlayer()) return;
 		
 		this.minecraft.getProfiler().push("armor");
 		setup();
@@ -227,15 +228,15 @@ public class LibhudGui extends Gui {
 		int baseX = this.screenWidth / 2 - 91;
 		int armor = player.getArmorValue();
 		
-		for (int i = 0; i < 10; ++i)
+		for (int i = 0; i < 10; i++)
 			if (armor > 0) {
-				baseX += i * 8;
 				if (i * 2 + 1 < armor)
 					blit(poseStack, baseX, baseY, 34, 9, 9, 9);
 				if (i * 2 + 1 == armor)
 					blit(poseStack, baseX, baseY, 25, 9, 9, 9);
 				if (i * 2 + 1 > armor)
 					blit(poseStack, baseX, baseY, 16, 9, 9, 9);
+				baseX += 8;
 			}
 		
 		this.leftOffset += 10;
@@ -245,7 +246,7 @@ public class LibhudGui extends Gui {
 	protected void renderFood(PoseStack poseStack) {
 		Player player = getCameraPlayer();
 		if (player == null) return;
-		if (this.minecraft.gameMode.canHurtPlayer()) return;
+		if (!this.minecraft.gameMode.canHurtPlayer()) return;
 		if (getVehicleMaxHearts(getPlayerVehicleWithHealth()) != 0) return;
 		
 		this.minecraft.getProfiler().push("food");
@@ -282,9 +283,9 @@ public class LibhudGui extends Gui {
 	protected void renderAir(PoseStack poseStack) {
 		Player player = getCameraPlayer();
 		if (player == null) return;
-		if (this.minecraft.gameMode.canHurtPlayer()) return;
+		if (!this.minecraft.gameMode.canHurtPlayer()) return;
 		
-		this.minecraft.getProfiler().popPush("air");
+		this.minecraft.getProfiler().push("air");
 		setup();
 		int baseY = this.screenHeight - this.rightOffset;
 		int baseX = this.screenWidth / 2 + 91 - 9;
@@ -299,16 +300,15 @@ public class LibhudGui extends Gui {
 				if (i < bubbles)
 					blit(poseStack, baseX - i * 8, baseY, 16, 18, 9, 9);
 				else blit(poseStack, baseX - i * 8, baseY, 25, 18, 9, 9);
+			this.rightOffset += 10;
 		}
-		
-		this.rightOffset += 10;
 		this.minecraft.getProfiler().pop();
 	}
 	
 	protected void renderHearts(PoseStack poseStack) {
 		Player player = this.getCameraPlayer();
 		if (player == null) return;
-		if (this.minecraft.gameMode.canHurtPlayer()) return;
+		if (!this.minecraft.gameMode.canHurtPlayer()) return;
 		
 		this.minecraft.getProfiler().push("health");
 		setup();

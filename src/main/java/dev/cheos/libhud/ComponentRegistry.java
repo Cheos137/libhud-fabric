@@ -4,6 +4,7 @@ import java.util.*;
 
 import org.apache.commons.lang3.tuple.Pair;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 
 import dev.cheos.libhud.api.Component;
@@ -76,6 +77,8 @@ public class ComponentRegistry {
 	
 	@Deprecated
 	public void replace(ResourceLocation id, Component component) {
+		Preconditions.checkNotNull(id, "id is null");
+		Preconditions.checkNotNull(component, "component is null");
 		if (!this.components.containsKey(id))
 			registerTop(id, component);
 		else {
@@ -92,13 +95,21 @@ public class ComponentRegistry {
 	
 	@Deprecated
 	public void unregister(ResourceLocation id) {
+		Preconditions.checkNotNull(id, "id is null");
 		if (!this.components.containsKey(id)) return;
 		this.orderedComponents.remove(this.components.get(id));
 		this.components.remove(id);
 		updateCache();
 	}
 	
+	@Deprecated
+	public void unregister(NamedComponent component) {
+		unregister(component.getName());
+	}
+	
 	private void register(ResourceLocation id, Component component) {
+		Preconditions.checkNotNull(id, "id is null");
+		Preconditions.checkNotNull(component, "component is null");
 		if (this.components.containsKey(id))
 			throw new IllegalArgumentException("tried to register component " + id + " twice. Use #unregister(ResourceLocation) or replace(ResourceLocation, Component) if it is desired to replace another component.");
 		this.components.put(id, component);

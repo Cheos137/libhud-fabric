@@ -59,4 +59,9 @@ public class RegisterComponentsEvent extends Event {
 	public void unregister(ResourceLocation id) {
 		this.registry.unregister(id);
 	}
+	
+	@Deprecated
+	public void unregister(NamedComponent component) {
+		this.registry.unregister(component);
+	}
 }
