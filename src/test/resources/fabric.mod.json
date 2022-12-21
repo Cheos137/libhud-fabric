@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "id": "libhud-test",
+  "version": "${version}",
+
+  "name": "libhud-test",
+  "description": "A library mod for improving hud compatibility between mods",
+  "authors": [
+    "Cheos"
+  ],
+  "contact": {
+    "homepage": "https://github.com/Cheos137/libhud-fabric",
+    "sources": "https://github.com/Cheos137/libhud-fabric",
+    "issues": "https://github.com/Cheos137/libhud-fabric/issues/new"
+  },
+
+  "license": "MIT",
+  "icon": "",
+
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      
+    ]
+  },
+  "mixins": [ ],
+
+  "depends": {
+    "fabricloader": ">=0.14.11",
+    "minecraft": "~1.19.3",
+    "java": ">=17"
+  },
+  "suggests": {
+    "fabric": "*"
+  }
+}

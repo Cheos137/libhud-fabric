@@ -3,7 +3,7 @@ plugins {
 	id 'maven-publish'
 }
 
-version = 'fabric-1.0.0'
+version = 'fabric-0.1.0'
 group = 'dev.cheos'
 archivesBaseName = 'libhud'
 
