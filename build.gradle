@@ -12,15 +12,20 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 dependencies {
 	minecraft 'com.mojang:minecraft:1.19.3'
 	mappings loom.officialMojangMappings()
+
 	modImplementation 'net.fabricmc:fabric-loader:0.14.11'
 
-	modCompileOnly 'net.fabricmc.fabric-api:fabric-api:0.68.1+1.19.3'
+	modCompileOnly 'net.fabricmc.fabric-api:fabric-api:0.69.1+1.19.3'
 }
 
 sourceSets {
 	test {
 		// java { srcDirs += sourceSets.main.allJava }
 		// resources { srcDirs += sourceSets.main.resources }
+	}
+
+	api {
+
 	}
 }
 
@@ -44,6 +49,13 @@ jar {
 
 loom {
 	accessWidenerPath = file('src/main/resources/libhud.accesswidener')
+
+	mods {
+		libhud {
+			sourceSet sourceSets.api
+			sourceSet sourceSets.main
+		}
+	}
 
 	runs {
 		client {
