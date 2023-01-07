@@ -21,11 +21,27 @@ public class RegisterComponentsEvent extends Event {
 		this.registry.registerAbove(other, component);
 	}
 	
+	public void registerAbove(NamedComponent other, ResourceLocation id, Component component) {
+		this.registry.registerAbove(other, id, component);
+	}
+	
+	public void registerAbove(NamedComponent other, NamedComponent component) {
+		this.registry.registerAbove(other, component);
+	}
+	
 	public void registerBelow(ResourceLocation other, ResourceLocation id, Component component) {
 		this.registry.registerBelow(other, id, component);
 	}
 	
 	public void registerBelow(ResourceLocation other, NamedComponent component) {
+		this.registry.registerBelow(other, component);
+	}
+	
+	public void registerBelow(NamedComponent other, ResourceLocation id, Component component) {
+		this.registry.registerBelow(other, id, component);
+	}
+	
+	public void registerBelow(NamedComponent other, NamedComponent component) {
 		this.registry.registerBelow(other, component);
 	}
 	

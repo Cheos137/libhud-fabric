@@ -6,17 +6,17 @@ import dev.cheos.libhud.api.Component.NamedComponent;
 import net.fabricmc.loader.api.FabricLoader;
 
 public class VanillaComponents {
-	static final NamedComponent HOTBAR         = named("minecraft:hotbar"        , (gui, poseStack, partialTicks, screenWidth, screenHeight) -> gui.renderHotbar(partialTicks, poseStack));
-	static final NamedComponent CROSSHAIR      = named("minecraft:crosshair"     , (gui, poseStack, partialTicks, screenWidth, screenHeight) -> gui.renderCrosshair(poseStack));
-	static final NamedComponent EXPERIENCE_BAR = named("minecraft:experience_bar", (gui, poseStack, partialTicks, screenWidth, screenHeight) -> gui.renderExperienceBar(poseStack));
-	static final NamedComponent JUMP_METER     = named("minecraft:jump_meter"    , (gui, poseStack, partialTicks, screenWidth, screenHeight) -> gui.renderJumpMeter(poseStack));
-	static final NamedComponent BOSS_HEALTH    = named("minecraft:boss_health"   , (gui, poseStack, partialTicks, screenWidth, screenHeight) -> gui.renderBossHealth(poseStack));
-	static final NamedComponent ARMOR          = named("minecraft:armor"         , (gui, poseStack, partialTicks, screenWidth, screenHeight) -> gui.renderArmor(poseStack));
-	static final NamedComponent HEALTH         = named("minecraft:health"        , (gui, poseStack, partialTicks, screenWidth, screenHeight) -> gui.renderHearts(poseStack));
-	static final NamedComponent FOOD           = named("minecraft:food"          , (gui, poseStack, partialTicks, screenWidth, screenHeight) -> gui.renderFood(poseStack));
-	static final NamedComponent AIR            = named("minecraft:air"           , (gui, poseStack, partialTicks, screenWidth, screenHeight) -> gui.renderAir(poseStack));
-	static final NamedComponent VEHICLE_HEALTH = named("minecraft:vehicle_health", (gui, poseStack, partialTicks, screenWidth, screenHeight) -> gui.renderVehicleHealth(poseStack));
-	static final NamedComponent ITEM_NAME      = named("minecraft:item_name"     , (gui, poseStack, partialTicks, screenWidth, screenHeight) -> gui.renderSelectedItemName(poseStack));
+	public static final NamedComponent HOTBAR         = named("minecraft:hotbar"        , (gui, poseStack, partialTicks, screenWidth, screenHeight) -> gui.renderHotbar(partialTicks, poseStack));
+	public static final NamedComponent CROSSHAIR      = named("minecraft:crosshair"     , (gui, poseStack, partialTicks, screenWidth, screenHeight) -> gui.renderCrosshair(poseStack));
+	public static final NamedComponent EXPERIENCE_BAR = named("minecraft:experience_bar", (gui, poseStack, partialTicks, screenWidth, screenHeight) -> gui.renderExperienceBar(poseStack));
+	public static final NamedComponent JUMP_METER     = named("minecraft:jump_meter"    , (gui, poseStack, partialTicks, screenWidth, screenHeight) -> gui.renderJumpMeter(poseStack));
+	public static final NamedComponent BOSS_HEALTH    = named("minecraft:boss_health"   , (gui, poseStack, partialTicks, screenWidth, screenHeight) -> gui.renderBossHealth(poseStack));
+	public static final NamedComponent ARMOR          = named("minecraft:armor"         , (gui, poseStack, partialTicks, screenWidth, screenHeight) -> gui.renderArmor(poseStack));
+	public static final NamedComponent HEALTH         = named("minecraft:health"        , (gui, poseStack, partialTicks, screenWidth, screenHeight) -> gui.renderHearts(poseStack));
+	public static final NamedComponent FOOD           = named("minecraft:food"          , (gui, poseStack, partialTicks, screenWidth, screenHeight) -> gui.renderFood(poseStack));
+	public static final NamedComponent AIR            = named("minecraft:air"           , (gui, poseStack, partialTicks, screenWidth, screenHeight) -> gui.renderAir(poseStack));
+	public static final NamedComponent VEHICLE_HEALTH = named("minecraft:vehicle_health", (gui, poseStack, partialTicks, screenWidth, screenHeight) -> gui.renderVehicleHealth(poseStack));
+	public static final NamedComponent ITEM_NAME      = named("minecraft:item_name"     , (gui, poseStack, partialTicks, screenWidth, screenHeight) -> gui.renderSelectedItemName(poseStack));
 	
 	static void register(ComponentRegistry registry) {
 		registry.registerTop(HOTBAR);

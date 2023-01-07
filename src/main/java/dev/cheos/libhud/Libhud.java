@@ -11,8 +11,8 @@ import dev.cheos.libhud.api.event.EventBus.EventPriority;
 public class Libhud { // TODO mixin capture magic
 	public static final Logger LOGGER = LogManager.getLogger("libhud");
 	
-	public void client() {
-		
+	public void client() { // "main" fires before "client" -> event listeners should be either registered on "<init>", "preLaunch" or "main"
+		eventBus().post(new RegisterComponentsEvent(ComponentRegistry.INSTANCE));
 	}
 	
 	

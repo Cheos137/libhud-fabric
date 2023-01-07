@@ -41,6 +41,14 @@ public class ComponentRegistry {
 		registerAbove(other, component.getName(), component);
 	}
 	
+	public void registerAbove(NamedComponent other, ResourceLocation id, Component component) {
+		registerAbove(other.getName(), id, component);
+	}
+	
+	public void registerAbove(NamedComponent other, NamedComponent component) {
+		registerAbove(other.getName(), component);
+	}
+	
 	public void registerBelow(ResourceLocation other, ResourceLocation id, Component component) {
 		if (!components.containsKey(other))
 			registerBottom(id, component);
@@ -53,6 +61,14 @@ public class ComponentRegistry {
 	
 	public void registerBelow(ResourceLocation other, NamedComponent component) {
 		registerBelow(other, component.getName(), component);
+	}
+	
+	public void registerBelow(NamedComponent other, ResourceLocation id, Component component) {
+		registerBelow(other.getName(), id, component);
+	}
+	
+	public void registerBelow(NamedComponent other, NamedComponent component) {
+		registerBelow(other.getName(), component);
 	}
 	
 	public void registerTop(ResourceLocation id, Component component) {
