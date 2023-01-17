@@ -14,7 +14,7 @@ public class EventBus {
 	
 	public boolean post(Event event) {
 		Class<?> clazz = event.getClass();
-		while (clazz != Event.class) {
+		while (clazz != Object.class) {
 			Map<EventPriority, List<Pair<Boolean, Consumer<Event>>>> listeners = this.listeners.computeIfAbsent(clazz, k -> new HashMap<>());
 			for (EventPriority prio : EventPriority.values())
 				if (listeners.containsKey(prio))
