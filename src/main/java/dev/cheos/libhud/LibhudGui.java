@@ -47,7 +47,7 @@ public class LibhudGui extends Gui {
 		if (EventBus.LIBHUD_BUS.post(new RenderEvent(poseStack, partialTicks, window, EventPhase.PRE))) return;
 		
 		if (Minecraft.useFancyGraphics()) {
-			this.renderVignette(this.minecraft.getCameraEntity());
+			this.renderVignette(poseStack, this.minecraft.getCameraEntity());
 		} else {
 			RenderSystem.enableDepthTest();
 			RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
@@ -58,21 +58,21 @@ public class LibhudGui extends Gui {
 		this.scopeScale = Mth.lerp(0.5F * delta, this.scopeScale, 1.125F);
 		if (this.minecraft.options.getCameraType().isFirstPerson()) {
 			if (this.minecraft.player.isScoping()) {
-				renderSpyglassOverlay(this.scopeScale);
+				renderSpyglassOverlay(poseStack, this.scopeScale);
 			} else {
 				this.scopeScale = 0.5F;
 				ItemStack itemStack = this.minecraft.player.getInventory().getArmor(3);
 				if (itemStack.is(Blocks.CARVED_PUMPKIN.asItem()))
-					renderTextureOverlay(PUMPKIN_BLUR_LOCATION, 1.0F);
+					renderTextureOverlay(poseStack, PUMPKIN_BLUR_LOCATION, 1.0F);
 			}
 		}
 		
 		if (this.minecraft.player.getTicksFrozen() > 0)
-			this.renderTextureOverlay(POWDER_SNOW_OUTLINE_LOCATION, this.minecraft.player.getPercentFrozen());
+			this.renderTextureOverlay(poseStack, POWDER_SNOW_OUTLINE_LOCATION, this.minecraft.player.getPercentFrozen());
 		
 		float portalTime = Mth.lerp(partialTicks, this.minecraft.player.oPortalTime, this.minecraft.player.portalTime);
 		if (portalTime > 0.0F && !this.minecraft.player.hasEffect(MobEffects.CONFUSION))
-			this.renderPortalOverlay(portalTime);
+			this.renderPortalOverlay(poseStack, portalTime);
 		
 		if (this.minecraft.gameMode.getPlayerMode() == GameType.SPECTATOR)
 			this.spectatorGui.renderHotbar(poseStack);
@@ -411,7 +411,7 @@ public class LibhudGui extends Gui {
 	public void renderSelectedItemName(PoseStack poseStack) {
 		setup();
 		RenderSystem.disableBlend();
-		if (this.minecraft.options.heldItemTooltips && this.minecraft.gameMode.getPlayerMode() != GameType.SPECTATOR)
+		if (this.minecraft.options.advancedItemTooltips && this.minecraft.gameMode.getPlayerMode() != GameType.SPECTATOR)
 			super.renderSelectedItemName(poseStack);
 		else if (this.minecraft.player.isSpectator())
 			this.spectatorGui.renderTooltip(poseStack);
