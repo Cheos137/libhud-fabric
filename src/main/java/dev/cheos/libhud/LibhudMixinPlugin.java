@@ -18,7 +18,8 @@ import net.fabricmc.loader.impl.launch.FabricLauncherBase;
 import net.fabricmc.loader.impl.launch.knot.MixinServiceKnot;
 
 public class LibhudMixinPlugin implements IMixinConfigPlugin {
-	private static final String GUI_CLASS_NAME = "net.minecraft.client.gui.Gui"; // Gui.class.getName();
+	static final String GUI_CLASS_NAME = "net.minecraft.client.gui.Gui"; // Gui.class.getName();
+	static final String LIBHUD_GUI_CLASS_NAME = "dev.cheos.libhud.LibhudGui"; // LibhudGui.class.getName();
 	private final List<String> mixinClasses = new LinkedList<>();
 	private final LibhudStreamHandler urlHandle = new LibhudStreamHandler();
 	
@@ -30,6 +31,15 @@ public class LibhudMixinPlugin implements IMixinConfigPlugin {
 	@Override
 	@SuppressWarnings("unchecked")
 	public void acceptTargets(Set<String> myTargets, Set<String> otherTargets) {
+		/*
+		 * Look away before it is to late.
+		 * What follows might not be very nice nor a stable solution
+		 * but it's the only way i've found to snatch mixins.
+		 * (which itself is very much not intended to be done)
+		 * As i've said - if you tread ahead, you're on your own - for i have warned you!
+		 * 
+		 * In an attempt to maximise compatibility ~ Cheos
+		 */
 		try {
 			Class<?> cMixinTransformer = Class.forName("org.spongepowered.asm.mixin.transformer.MixinTransformer");
 			Class<?> cMixinProcessor = Class.forName("org.spongepowered.asm.mixin.transformer.MixinProcessor");
@@ -52,8 +62,9 @@ public class LibhudMixinPlugin implements IMixinConfigPlugin {
 			List<? extends IMixinConfig> configs = (List<? extends IMixinConfig>) fConfigs.get(processor);
 			List<IMixinInfo> mixins = new ArrayList<>();
 			for (IMixinConfig config : configs)
-				if ((boolean) mHasMixinsFor.invoke(config, GUI_CLASS_NAME))
-					mixins.addAll((List<? extends IMixinInfo>) mGetMixinsFor.invoke(config, GUI_CLASS_NAME));
+				if (!config.getMixinPackage().startsWith("net.fabricmc.fabric.mixin"))
+					if ((boolean) mHasMixinsFor.invoke(config, GUI_CLASS_NAME))
+						mixins.addAll((List<? extends IMixinInfo>) mGetMixinsFor.invoke(config, GUI_CLASS_NAME));
 			
 			for (IMixinInfo mixin : mixins) {
 				String className = mixin.getClassName();
