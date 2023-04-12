@@ -49,6 +49,7 @@ public class LibhudGui extends Gui {
 		if (Minecraft.useFancyGraphics()) {
 			this.renderVignette(poseStack, this.minecraft.getCameraEntity());
 		} else {
+			// otherwise set by #renderVignette
 			RenderSystem.enableDepthTest();
 			RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 			RenderSystem.defaultBlendFunc();
@@ -215,7 +216,9 @@ public class LibhudGui extends Gui {
 	}
 	
 	@Override
-	protected void renderPlayerHealth(PoseStack poseStack) { }
+	protected void renderPlayerHealth(PoseStack poseStack) { } // replaced by components
+	
+	// VANILLA COMPONENTS START // replacements for #renderPlayerHealth
 	
 	protected void renderArmor(PoseStack poseStack) {
 		Player player = getCameraPlayer();
@@ -350,6 +353,7 @@ public class LibhudGui extends Gui {
 		this.minecraft.getProfiler().pop();
 	}
 	
+	// edited to reset texture location / render state + fix profiler with component structure
 	@Override
 	protected void renderVehicleHealth(PoseStack poseStack) {
 		setup();
@@ -416,6 +420,8 @@ public class LibhudGui extends Gui {
 		else if (this.minecraft.player.isSpectator())
 			this.spectatorGui.renderTooltip(poseStack);
 	}
+	
+	// VANILLA COMPONENTS END //
 	
 	@Override
 	protected void renderCrosshair(PoseStack poseStack) {

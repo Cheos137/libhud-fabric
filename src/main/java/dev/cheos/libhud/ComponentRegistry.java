@@ -127,7 +127,7 @@ public class ComponentRegistry {
 		Preconditions.checkNotNull(id, "id is null");
 		Preconditions.checkNotNull(component, "component is null");
 		if (this.components.containsKey(id))
-			throw new IllegalArgumentException("tried to register component " + id + " twice. Use #unregister(ResourceLocation) or replace(ResourceLocation, Component) if it is desired to replace another component.");
+			throw new IllegalArgumentException("tried to register component " + id + " twice. Use #unregister(ResourceLocation) or #replace(ResourceLocation, Component) if it is desired to replace another component.");
 		this.components.put(id, component);
 	}
 	

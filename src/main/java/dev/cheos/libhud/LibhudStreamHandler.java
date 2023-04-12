@@ -37,7 +37,7 @@ public class LibhudStreamHandler extends URLStreamHandler {
 			super(url);
 			this.b = b;
 		}
-
+		
 		@Override
 		public void connect() throws IOException {
 			throw new UnsupportedOperationException("connections not supported by " + getClass().getSimpleName());
