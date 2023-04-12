@@ -3,9 +3,9 @@ plugins {
 	id 'maven-publish'
 }
 
-version = '0.2.0-fabric-1.19.4'
+version = '1.19.4-1.0.0-beta1'
 group = 'dev.cheos'
-archivesBaseName = 'libhud'
+archivesBaseName = 'libhud-fabric'
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
