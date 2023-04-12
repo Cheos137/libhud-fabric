@@ -435,4 +435,9 @@ public class LibhudGui extends Gui {
 		if (this.minecraft.gameMode.getPlayerMode() != GameType.SPECTATOR)
 			super.renderHotbar(partialTicks, poseStack);
 	}
+	
+	// publicise getters
+	@Override public Player getCameraPlayer() { return super.getCameraPlayer(); }
+	@Override public LivingEntity getPlayerVehicleWithHealth() { return super.getPlayerVehicleWithHealth(); }
+	@Override public int getVehicleMaxHearts(LivingEntity livingEntity) { return super.getVehicleMaxHearts(livingEntity); }
 }
