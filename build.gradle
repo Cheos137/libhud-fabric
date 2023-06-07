@@ -3,7 +3,7 @@ plugins {
 	id 'maven-publish'
 }
 
-version = '1.19.4-1.0.0-beta1'
+version = '1.20-1.0.0-beta2'
 group = 'dev.cheos'
 archivesBaseName = 'libhud-fabric'
 
@@ -17,12 +17,12 @@ sourceSets {
 }
 
 dependencies {
-	minecraft 'com.mojang:minecraft:1.19.4'
+	minecraft 'com.mojang:minecraft:1.20'
 	mappings loom.officialMojangMappings()
 
-	modImplementation 'net.fabricmc:fabric-loader:0.14.19'
+	modImplementation 'net.fabricmc:fabric-loader:0.14.21'
 
-	modCompileOnly 'net.fabricmc.fabric-api:fabric-api:0.76.0+1.19.4'
+	modCompileOnly 'net.fabricmc.fabric-api:fabric-api:0.83.0+1.20'
 }
 
 processResources {
@@ -49,7 +49,7 @@ loom {
 	runs {
 		client {
 			environment = 'client'
-			configName = 'runLibhudClient-fabric-1.19'
+			configName = 'runLibhudClient-fabric-1.20'
 			runDir = 'run/client'
 			source = sourceSets.main
 			ideConfigGenerated = true
@@ -60,7 +60,7 @@ loom {
 		test {
 			inherit client
 			
-			configName = 'runLibhudClientTEST-fabric-1.19'
+			configName = 'runLibhudClientTEST-fabric-1.20'
 			source = sourceSets.test
 		}
 	}

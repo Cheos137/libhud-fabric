@@ -4,16 +4,13 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 
 import dev.cheos.libhud.api.Component;
 import dev.cheos.libhud.api.event.*;
 import dev.cheos.libhud.api.event.Event.EventPhase;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.Gui;
-import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.gui.*;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.FluidTags;
@@ -36,53 +33,50 @@ public class LibhudGui extends Gui {
 	}
 	
 	@Override
-	public void render(PoseStack poseStack, float partialTicks) {
+	public void render(GuiGraphics graphics, float partialTicks) {
 		Window window = this.minecraft.getWindow();
-		this.screenWidth = window.getGuiScaledWidth();
-		this.screenHeight = window.getGuiScaledHeight();
+		this.screenWidth = graphics.guiWidth();
+		this.screenHeight = graphics.guiHeight();
 		this.leftOffset = this.rightOffset = 39;
 		Font font = this.getFont();
 		RenderSystem.enableBlend();
 		
-		if (EventBus.LIBHUD_BUS.post(new RenderEvent(poseStack, partialTicks, window, EventPhase.PRE))) return;
+		if (EventBus.LIBHUD_BUS.post(new RenderEvent(graphics, partialTicks, window, EventPhase.PRE))) return;
 		
 		if (Minecraft.useFancyGraphics()) {
-			this.renderVignette(poseStack, this.minecraft.getCameraEntity());
-		} else {
+			this.renderVignette(graphics, this.minecraft.getCameraEntity());
+		} else
 			// otherwise set by #renderVignette
 			RenderSystem.enableDepthTest();
-			RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-			RenderSystem.defaultBlendFunc();
-		}
 		
 		float delta = this.minecraft.getDeltaFrameTime();
 		this.scopeScale = Mth.lerp(0.5F * delta, this.scopeScale, 1.125F);
 		if (this.minecraft.options.getCameraType().isFirstPerson()) {
 			if (this.minecraft.player.isScoping()) {
-				renderSpyglassOverlay(poseStack, this.scopeScale);
+				renderSpyglassOverlay(graphics, this.scopeScale);
 			} else {
 				this.scopeScale = 0.5F;
 				ItemStack itemStack = this.minecraft.player.getInventory().getArmor(3);
 				if (itemStack.is(Blocks.CARVED_PUMPKIN.asItem()))
-					renderTextureOverlay(poseStack, PUMPKIN_BLUR_LOCATION, 1.0F);
+					renderTextureOverlay(graphics, PUMPKIN_BLUR_LOCATION, 1.0F);
 			}
 		}
 		
 		if (this.minecraft.player.getTicksFrozen() > 0)
-			this.renderTextureOverlay(poseStack, POWDER_SNOW_OUTLINE_LOCATION, this.minecraft.player.getPercentFrozen());
+			this.renderTextureOverlay(graphics, POWDER_SNOW_OUTLINE_LOCATION, this.minecraft.player.getPercentFrozen());
 		
-		float portalTime = Mth.lerp(partialTicks, this.minecraft.player.oPortalTime, this.minecraft.player.portalTime);
+		float portalTime = Mth.lerp(partialTicks, this.minecraft.player.oSpinningEffectIntensity, this.minecraft.player.spinningEffectIntensity);
 		if (portalTime > 0.0F && !this.minecraft.player.hasEffect(MobEffects.CONFUSION))
-			this.renderPortalOverlay(poseStack, portalTime);
+			this.renderPortalOverlay(graphics, portalTime);
 		
 		if (this.minecraft.gameMode.getPlayerMode() == GameType.SPECTATOR)
-			this.spectatorGui.renderHotbar(poseStack);
+			this.spectatorGui.renderHotbar(graphics);
 		
 		if (!this.minecraft.options.hideGui)
 			for (Pair<ResourceLocation, Component> component : ComponentRegistry.INSTANCE.getComponents()) {
-				if (EventBus.LIBHUD_BUS.post(new RenderComponentEvent(poseStack, partialTicks, window, component.getLeft(), component.getRight(), EventPhase.PRE))) continue;
-				component.getRight().render(this, poseStack, partialTicks, this.screenWidth, this.screenHeight);
-				EventBus.LIBHUD_BUS.post(new RenderComponentEvent(poseStack, partialTicks, window, component.getLeft(), component.getRight(), EventPhase.POST));
+				if (EventBus.LIBHUD_BUS.post(new RenderComponentEvent(graphics, partialTicks, window, component.getLeft(), component.getRight(), EventPhase.PRE))) continue;
+				component.getRight().render(this, graphics, partialTicks, this.screenWidth, this.screenHeight);
+				EventBus.LIBHUD_BUS.post(new RenderComponentEvent(graphics, partialTicks, window, component.getLeft(), component.getRight(), EventPhase.POST));
 			}
 		
 		if (this.minecraft.player.getSleepTimer() > 0) {
@@ -93,19 +87,17 @@ public class LibhudGui extends Gui {
 			if (sleepTime > 1.0F)
 				sleepTime = 1.0F - (sleepTimePercent - 100.0F) / 10.0F;
 			
-			int overlayColor = (int) (220.0F * sleepTime) << 24 | 1052704;
-			fill(poseStack, 0, 0, this.screenWidth, this.screenHeight, overlayColor);
-			RenderSystem.enableDepthTest();
-			RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+			int overlayColor = (int) (220.0F * sleepTime) << 24 | 0x101020;
+			graphics.fill(0, 0, this.screenWidth, this.screenHeight, overlayColor);
 			this.minecraft.getProfiler().pop();
 		}
 		
 		if (this.minecraft.isDemo())
-			this.renderDemoOverlay(poseStack);
+			this.renderDemoOverlay(graphics);
 		
-		this.renderEffects(poseStack);
+		this.renderEffects(graphics);
 		if (this.minecraft.options.renderDebug)
-			this.debugScreen.render(poseStack);
+			this.debugScreen.render(graphics);
 		
 		if (!this.minecraft.options.hideGui) {
 			if (this.overlayMessageString != null && this.overlayMessageTime > 0) {
@@ -116,20 +108,17 @@ public class LibhudGui extends Gui {
 					clampedTime = 255;
 				
 				if (clampedTime > 8) {
-					poseStack.pushPose();
-					poseStack.translate(this.screenWidth / 2, this.screenHeight - 68, 0.0F);
-					RenderSystem.enableBlend();
-					RenderSystem.defaultBlendFunc();
-					int color = 16777215;
+					graphics.pose().pushPose();
+					graphics.pose().translate(this.screenWidth / 2, this.screenHeight - 68, 0.0F);
+					int color = 0xffffff;
 					if (this.animateOverlayMessageColor)
-						color = Mth.hsvToRgb(offsetTime / 50.0F, 0.7F, 0.6F) & 16777215;
+						color = Mth.hsvToRgb(offsetTime / 50.0F, 0.7F, 0.6F) & 0xffffff;
 					
-					int alpha = clampedTime << 24 & -16777216;
+					int alpha = clampedTime << 24 & 0xff000000;
 					int width = font.width(this.overlayMessageString);
-					this.drawBackdrop(poseStack, font, -4, width, 16777215 | alpha);
-					font.drawShadow(poseStack, this.overlayMessageString, -width / 2, -4.0F, color | alpha);
-					RenderSystem.disableBlend();
-					poseStack.popPose();
+					this.drawBackdrop(graphics, font, -4, width, 0xffffff | alpha);
+					graphics.drawString(font, this.overlayMessageString, -width / 2, -4, color | alpha);
+					graphics.pose().popPose();
 				}
 				
 				this.minecraft.getProfiler().pop();
@@ -146,32 +135,31 @@ public class LibhudGui extends Gui {
 				clampedTime = Mth.clamp(clampedTime, 0, 255);
 				
 				if (clampedTime > 8) {
-					poseStack.pushPose();
-					poseStack.translate(this.screenWidth / 2, this.screenHeight / 2, 0.0F);
+					graphics.pose().pushPose();
+					graphics.pose().translate(this.screenWidth / 2, this.screenHeight / 2, 0.0F);
 					RenderSystem.enableBlend();
-					RenderSystem.defaultBlendFunc();
-					poseStack.pushPose();
-					poseStack.scale(4.0F, 4.0F, 4.0F);
-					int alpha = clampedTime << 24 & -16777216;
+					graphics.pose().pushPose();
+					graphics.pose().scale(4.0F, 4.0F, 4.0F);
+					int alpha = clampedTime << 24 & 0xff000000;
 					int titleWidth = font.width(this.title);
-					this.drawBackdrop(poseStack, font, -10, titleWidth, 16777215 | alpha);
-					font.drawShadow(poseStack, this.title, -titleWidth / 2, -10.0F, 16777215 | alpha);
-					poseStack.popPose();
+					this.drawBackdrop(graphics, font, -10, titleWidth, 0xffffff | alpha);
+					graphics.drawString(font, this.title, -titleWidth / 2, -10, 0xffffff | alpha);
+					graphics.pose().popPose();
 					if (this.subtitle != null) {
-						poseStack.pushPose();
-						poseStack.scale(2.0F, 2.0F, 2.0F);
+						graphics.pose().pushPose();
+						graphics.pose().scale(2.0F, 2.0F, 2.0F);
 						int subtitleWidth = font.width(this.subtitle);
-						this.drawBackdrop(poseStack, font, 5, subtitleWidth, 16777215 | alpha);
-						font.drawShadow(poseStack, this.subtitle, -subtitleWidth / 2, 5.0F, 16777215 | alpha);
-						poseStack.popPose();
+						this.drawBackdrop(graphics, font, 5, subtitleWidth, 0xffffff | alpha);
+						graphics.drawString(font, this.subtitle, -subtitleWidth / 2, 5, 0xffffff | alpha);
+						graphics.pose().popPose();
 					}
 					RenderSystem.disableBlend();
-					poseStack.popPose();
+					graphics.pose().popPose();
 				}
 				this.minecraft.getProfiler().pop();
 			}
 			
-			this.subtitleOverlay.render(poseStack);
+			this.subtitleOverlay.render(graphics);
 			Scoreboard scoreboard = this.minecraft.level.getScoreboard();
 			Objective objective = null;
 			PlayerTeam playerTeam = scoreboard.getPlayersTeam(this.minecraft.player.getScoreboardName());
@@ -183,44 +171,41 @@ public class LibhudGui extends Gui {
 			
 			Objective objective2 = objective != null ? objective : scoreboard.getDisplayObjective(1);
 			if (objective2 != null)
-				this.displayScoreboardSidebar(poseStack, objective2);
+				this.displayScoreboardSidebar(graphics, objective2);
 			
 			RenderSystem.enableBlend();
-			RenderSystem.defaultBlendFunc();
 			int scaledX = Mth.floor(this.minecraft.mouseHandler.xpos() * window.getGuiScaledWidth() / window.getScreenWidth());
 			int scaledY = Mth.floor(this.minecraft.mouseHandler.ypos() * window.getGuiScaledHeight() / window.getScreenHeight());
 			this.minecraft.getProfiler().push("chat");
-			this.chat.render(poseStack, this.tickCount, scaledX, scaledY);
+			this.chat.render(graphics, this.tickCount, scaledX, scaledY);
 			this.minecraft.getProfiler().pop();
 			objective2 = scoreboard.getDisplayObjective(0);
 			if (!this.minecraft.options.keyPlayerList.isDown() || this.minecraft.isLocalServer() && this.minecraft.player.connection.getListedOnlinePlayers().size() <= 1 && objective2 == null)
 				this.tabList.setVisible(false);
 			else {
 				this.tabList.setVisible(true);
-				this.tabList.render(poseStack, this.screenWidth, scoreboard, objective2);
+				this.tabList.render(graphics, this.screenWidth, scoreboard, objective2);
 			}
 			
-			this.renderSavingIndicator(poseStack);
+			this.renderSavingIndicator(graphics);
 		}
 		
-		EventBus.LIBHUD_BUS.post(new RenderEvent(poseStack, partialTicks, window, EventPhase.POST));
+		EventBus.LIBHUD_BUS.post(new RenderEvent(graphics, partialTicks, window, EventPhase.POST));
 		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 	}
 	
 	public void setup() {
 		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-		RenderSystem.setShader(GameRenderer::getPositionTexShader);
-		RenderSystem.setShaderTexture(0, GUI_ICONS_LOCATION);
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
 	}
 	
 	@Override
-	protected void renderPlayerHealth(PoseStack poseStack) { } // replaced by components
+	protected void renderPlayerHealth(GuiGraphics graphics) { } // replaced by components
 	
 	// VANILLA COMPONENTS START // replacements for #renderPlayerHealth
 	
-	protected void renderArmor(PoseStack poseStack) {
+	protected void renderArmor(GuiGraphics graphics) {
 		Player player = getCameraPlayer();
 		if (player == null) return;
 		if (!this.minecraft.gameMode.canHurtPlayer()) return;
@@ -234,11 +219,11 @@ public class LibhudGui extends Gui {
 		for (int i = 0; i < 10; i++)
 			if (armor > 0) {
 				if (i * 2 + 1 < armor)
-					blit(poseStack, baseX, baseY, 34, 9, 9, 9);
+					graphics.blit(GUI_ICONS_LOCATION, baseX, baseY, 34, 9, 9, 9);
 				if (i * 2 + 1 == armor)
-					blit(poseStack, baseX, baseY, 25, 9, 9, 9);
+					graphics.blit(GUI_ICONS_LOCATION, baseX, baseY, 25, 9, 9, 9);
 				if (i * 2 + 1 > armor)
-					blit(poseStack, baseX, baseY, 16, 9, 9, 9);
+					graphics.blit(GUI_ICONS_LOCATION, baseX, baseY, 16, 9, 9, 9);
 				baseX += 8;
 			}
 		
@@ -246,7 +231,7 @@ public class LibhudGui extends Gui {
 		this.minecraft.getProfiler().pop();
 	}
 	
-	protected void renderFood(PoseStack poseStack) {
+	protected void renderFood(GuiGraphics graphics) {
 		Player player = getCameraPlayer();
 		if (player == null) return;
 		if (!this.minecraft.gameMode.canHurtPlayer()) return;
@@ -272,18 +257,18 @@ public class LibhudGui extends Gui {
 				bgOffset = 13;
 			}
 			
-			blit(poseStack, x, y, 16 + bgOffset * 9, 27, 9, 9);
+			graphics.blit(GUI_ICONS_LOCATION, x, y, 16 + bgOffset * 9, 27, 9, 9);
 			if (i * 2 + 1 < food)
-				blit(poseStack, x, y, fgOffset + 52, 27, 9, 9);
+				graphics.blit(GUI_ICONS_LOCATION, x, y, fgOffset + 52, 27, 9, 9);
 			if (i * 2 + 1 == food)
-				blit(poseStack, x, y, fgOffset + 61, 27, 9, 9);
+				graphics.blit(GUI_ICONS_LOCATION, x, y, fgOffset + 61, 27, 9, 9);
 		}
 		
 		this.rightOffset += 10;
 		this.minecraft.getProfiler().pop();
 	}
 	
-	protected void renderAir(PoseStack poseStack) {
+	protected void renderAir(GuiGraphics graphics) {
 		Player player = getCameraPlayer();
 		if (player == null) return;
 		if (!this.minecraft.gameMode.canHurtPlayer()) return;
@@ -301,14 +286,14 @@ public class LibhudGui extends Gui {
 			
 			for (int i = 0; i < bubbles + poppedBubbles; ++i)
 				if (i < bubbles)
-					blit(poseStack, baseX - i * 8, baseY, 16, 18, 9, 9);
-				else blit(poseStack, baseX - i * 8, baseY, 25, 18, 9, 9);
+					graphics.blit(GUI_ICONS_LOCATION, baseX - i * 8, baseY, 16, 18, 9, 9);
+				else graphics.blit(GUI_ICONS_LOCATION, baseX - i * 8, baseY, 25, 18, 9, 9);
 			this.rightOffset += 10;
 		}
 		this.minecraft.getProfiler().pop();
 	}
 	
-	protected void renderHearts(PoseStack poseStack) {
+	protected void renderHearts(GuiGraphics graphics) {
 		Player player = this.getCameraPlayer();
 		if (player == null) return;
 		if (!this.minecraft.gameMode.canHurtPlayer()) return;
@@ -347,7 +332,7 @@ public class LibhudGui extends Gui {
 		if (player.hasEffect(MobEffects.REGENERATION))
 			yOffset = this.tickCount % Mth.ceil(maxHealth + 5.0F);
 		
-		renderHearts(poseStack, player, baseX, baseY, rowHeight, yOffset, maxHealth, health, displayHealth, absorb, blink);
+		renderHearts(graphics, player, baseX, baseY, rowHeight, yOffset, maxHealth, health, displayHealth, absorb, blink);
 		
 		this.leftOffset += rowCount * rowHeight;
 		this.minecraft.getProfiler().pop();
@@ -355,7 +340,7 @@ public class LibhudGui extends Gui {
 	
 	// edited to reset texture location / render state + fix profiler with component structure
 	@Override
-	protected void renderVehicleHealth(PoseStack poseStack) {
+	protected void renderVehicleHealth(GuiGraphics graphics) {
 		setup();
 		LivingEntity vehicle = this.getPlayerVehicleWithHealth();
 		if (vehicle == null) return;
@@ -374,11 +359,11 @@ public class LibhudGui extends Gui {
 			
 			for (int j = 0; j < maxRowHealth; j++) {
 				int x = baseX - j * 8 - 9;
-				blit(poseStack, x, y, 52, 9, 9, 9);
+				graphics.blit(GUI_ICONS_LOCATION, x, y, 52, 9, 9, 9);
 				if (j * 2 + 1 + i < health)
-					blit(poseStack, x, y, 88, 9, 9, 9);
+					graphics.blit(GUI_ICONS_LOCATION, x, y, 88, 9, 9, 9);
 				if (j * 2 + 1 + i == health)
-					blit(poseStack, x, y, 97, 9, 9, 9);
+					graphics.blit(GUI_ICONS_LOCATION, x, y, 97, 9, 9, 9);
 			}
 			
 			y -= 10;
@@ -387,53 +372,53 @@ public class LibhudGui extends Gui {
 		this.minecraft.getProfiler().pop();
 	}
 	
-	protected void renderJumpMeter(PoseStack poseStack) {
+	protected void renderJumpMeter(GuiGraphics graphics) {
 		setup();
 		RenderSystem.disableBlend();
 		PlayerRideableJumping playerRideableJumping = this.minecraft.player.jumpableVehicle();
 		if (playerRideableJumping == null) return;
-		super.renderJumpMeter(playerRideableJumping, poseStack, this.screenWidth / 2 - 91);
+		super.renderJumpMeter(playerRideableJumping, graphics, this.screenWidth / 2 - 91);
 	}
 	
-	protected void renderExperienceBar(PoseStack poseStack) {
+	protected void renderExperienceBar(GuiGraphics graphics) {
 		setup();
 		RenderSystem.disableBlend();
 		PlayerRideableJumping playerRideableJumping = this.minecraft.player.jumpableVehicle();
 		if (playerRideableJumping != null) return;
 		if (!this.minecraft.gameMode.hasExperience()) return;
-		super.renderExperienceBar(poseStack, this.screenWidth / 2 - 91);
+		super.renderExperienceBar(graphics, this.screenWidth / 2 - 91);
 	}
 	
-	protected void renderBossHealth(PoseStack poseStack) {
+	protected void renderBossHealth(GuiGraphics graphics) {
 		this.minecraft.getProfiler().push("bossHealth");
 		setup();
-		this.bossOverlay.render(poseStack);
+		this.bossOverlay.render(graphics);
 		this.minecraft.getProfiler().pop();
 	}
 	
 	@Override
-	public void renderSelectedItemName(PoseStack poseStack) {
+	public void renderSelectedItemName(GuiGraphics graphics) {
 		setup();
 		RenderSystem.disableBlend();
 		if (this.minecraft.options.advancedItemTooltips && this.minecraft.gameMode.getPlayerMode() != GameType.SPECTATOR)
-			super.renderSelectedItemName(poseStack);
+			super.renderSelectedItemName(graphics);
 		else if (this.minecraft.player.isSpectator())
-			this.spectatorGui.renderTooltip(poseStack);
+			this.spectatorGui.renderTooltip(graphics);
 	}
 	
 	// VANILLA COMPONENTS END //
 	
 	@Override
-	protected void renderCrosshair(PoseStack poseStack) {
+	protected void renderCrosshair(GuiGraphics graphics) {
 		setup();
-		super.renderCrosshair(poseStack);
+		super.renderCrosshair(graphics);
 	}
 	
 	@Override
-	protected void renderHotbar(float partialTicks, PoseStack poseStack) {
+	protected void renderHotbar(float partialTicks, GuiGraphics graphics) {
 //		setup(); // not needed here
 		if (this.minecraft.gameMode.getPlayerMode() != GameType.SPECTATOR)
-			super.renderHotbar(partialTicks, poseStack);
+			super.renderHotbar(partialTicks, graphics);
 	}
 	
 	// publicise getters
