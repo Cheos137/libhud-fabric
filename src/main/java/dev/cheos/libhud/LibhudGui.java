@@ -1,16 +1,17 @@
 package dev.cheos.libhud;
 
-import org.apache.commons.lang3.tuple.Pair;
-
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
-
 import dev.cheos.libhud.api.Component;
-import dev.cheos.libhud.api.event.*;
 import dev.cheos.libhud.api.event.Event.EventPhase;
+import dev.cheos.libhud.api.event.EventBus;
+import dev.cheos.libhud.api.event.RenderComponentEvent;
+import dev.cheos.libhud.api.event.RenderEvent;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.*;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.FluidTags;
@@ -23,7 +24,10 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.scores.*;
+import net.minecraft.world.scores.Objective;
+import net.minecraft.world.scores.PlayerTeam;
+import net.minecraft.world.scores.Scoreboard;
+import org.apache.commons.lang3.tuple.Pair;
 
 public class LibhudGui extends Gui {
 	public int leftOffset = 39, rightOffset = 39;
@@ -334,7 +338,7 @@ public class LibhudGui extends Gui {
 		
 		renderHearts(graphics, player, baseX, baseY, rowHeight, yOffset, maxHealth, health, displayHealth, absorb, blink);
 		
-		this.leftOffset += rowCount * rowHeight;
+		this.leftOffset += (rowCount - 1) * rowHeight + 10;
 		this.minecraft.getProfiler().pop();
 	}
 	
