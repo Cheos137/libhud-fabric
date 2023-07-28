@@ -215,9 +215,9 @@ public class LibhudGui extends Gui {
 		int baseY = this.screenHeight - this.leftOffset;
 		int baseX = this.screenWidth / 2 - 91;
 		int armor = player.getArmorValue();
-		
-		for (int i = 0; i < 10; i++)
-			if (armor > 0) {
+
+		if (armor > 0) {
+			for (int i = 0; i < 10; i++) {
 				if (i * 2 + 1 < armor)
 					graphics.blit(GUI_ICONS_LOCATION, baseX, baseY, 34, 9, 9, 9);
 				if (i * 2 + 1 == armor)
@@ -226,8 +226,8 @@ public class LibhudGui extends Gui {
 					graphics.blit(GUI_ICONS_LOCATION, baseX, baseY, 16, 9, 9, 9);
 				baseX += 8;
 			}
-		
-		this.leftOffset += 10;
+			this.leftOffset += 10;
+		}
 		this.minecraft.getProfiler().pop();
 	}
 	
