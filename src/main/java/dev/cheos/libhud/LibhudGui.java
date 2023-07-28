@@ -334,7 +334,7 @@ public class LibhudGui extends Gui {
 		
 		renderHearts(graphics, player, baseX, baseY, rowHeight, yOffset, maxHealth, health, displayHealth, absorb, blink);
 		
-		this.leftOffset += rowCount * rowHeight;
+		this.leftOffset += (rowCount - 1) * rowHeight + 10;
 		this.minecraft.getProfiler().pop();
 	}
 	
