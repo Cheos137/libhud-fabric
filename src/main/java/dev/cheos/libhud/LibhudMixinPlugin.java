@@ -31,6 +31,8 @@ public class LibhudMixinPlugin implements IMixinConfigPlugin {
 	@Override
 	@SuppressWarnings("unchecked")
 	public void acceptTargets(Set<String> myTargets, Set<String> otherTargets) {
+		if (!"true".equalsIgnoreCase(System.getProperty("libhud.debug", "false")))
+			return;
 		/*
 		 * Look away before it is to late.
 		 * What follows might not be very nice nor a stable solution
@@ -99,6 +101,8 @@ public class LibhudMixinPlugin implements IMixinConfigPlugin {
 	
 	@Override
 	public void preApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
+		if (!"true".equalsIgnoreCase(System.getProperty("libhud.debug", "false")))
+			return;
 		Libhud.LOGGER.info("preApply {}", mixinClassName);
 	}
 	
