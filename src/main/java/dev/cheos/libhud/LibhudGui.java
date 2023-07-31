@@ -75,6 +75,7 @@ public class LibhudGui extends Gui {
 		if (!this.minecraft.options.hideGui)
 			for (Pair<ResourceLocation, Component> component : ComponentRegistry.INSTANCE.getComponents()) {
 				if (EventBus.LIBHUD_BUS.post(new RenderComponentEvent(graphics, partialTicks, window, component.getLeft(), component.getRight(), EventPhase.PRE))) continue;
+				setup();
 				component.getRight().render(this, graphics, partialTicks, this.screenWidth, this.screenHeight);
 				EventBus.LIBHUD_BUS.post(new RenderComponentEvent(graphics, partialTicks, window, component.getLeft(), component.getRight(), EventPhase.POST));
 			}
