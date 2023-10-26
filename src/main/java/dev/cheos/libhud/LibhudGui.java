@@ -97,8 +97,8 @@ public class LibhudGui extends Gui {
 			this.renderDemoOverlay(graphics);
 		
 		this.renderEffects(graphics);
-		if (this.minecraft.options.renderDebug)
-			this.debugScreen.render(graphics);
+		if (this.debugOverlay.showDebugScreen())
+			this.debugOverlay.render(graphics);
 		
 		if (!this.minecraft.options.hideGui) {
 			if (this.overlayMessageString != null && this.overlayMessageTime > 0) {
@@ -165,12 +165,12 @@ public class LibhudGui extends Gui {
 			Objective objective = null;
 			PlayerTeam playerTeam = scoreboard.getPlayersTeam(this.minecraft.player.getScoreboardName());
 			if (playerTeam != null) {
-				int id = playerTeam.getColor().getId();
-				if (id >= 0)
-					objective = scoreboard.getDisplayObjective(3 + id);
+				DisplaySlot slot = DisplaySlot.teamColorToSlot(playerTeam.getColor());
+				if (slot != null)
+					objective = scoreboard.getDisplayObjective(slot);
 			}
 			
-			Objective objective2 = objective != null ? objective : scoreboard.getDisplayObjective(1);
+			Objective objective2 = objective != null ? objective : scoreboard.getDisplayObjective(DisplaySlot.SIDEBAR);
 			if (objective2 != null)
 				this.displayScoreboardSidebar(graphics, objective2);
 			
@@ -180,7 +180,7 @@ public class LibhudGui extends Gui {
 			this.minecraft.getProfiler().push("chat");
 			this.chat.render(graphics, this.tickCount, scaledX, scaledY);
 			this.minecraft.getProfiler().pop();
-			objective2 = scoreboard.getDisplayObjective(0);
+			objective2 = scoreboard.getDisplayObjective(DisplaySlot.LIST);
 			if (!this.minecraft.options.keyPlayerList.isDown() || this.minecraft.isLocalServer() && this.minecraft.player.connection.getListedOnlinePlayers().size() <= 1 && objective2 == null)
 				this.tabList.setVisible(false);
 			else {
@@ -220,11 +220,11 @@ public class LibhudGui extends Gui {
 		if (armor > 0) {
 			for (int i = 0; i < 10; i++) {
 				if (i * 2 + 1 < armor)
-					graphics.blit(GUI_ICONS_LOCATION, baseX, baseY, 34, 9, 9, 9);
+					graphics.blitSprite(ARMOR_FULL_SPRITE, baseX, baseY, 9, 9);
 				if (i * 2 + 1 == armor)
-					graphics.blit(GUI_ICONS_LOCATION, baseX, baseY, 25, 9, 9, 9);
+					graphics.blitSprite(ARMOR_HALF_SPRITE, baseX, baseY, 9, 9);
 				if (i * 2 + 1 > armor)
-					graphics.blit(GUI_ICONS_LOCATION, baseX, baseY, 16, 9, 9, 9);
+					graphics.blitSprite(ARMOR_EMPTY_SPRITE, baseX, baseY, 9, 9);
 				baseX += 8;
 			}
 			this.leftOffset += 10;
@@ -251,18 +251,13 @@ public class LibhudGui extends Gui {
 			if (player.getFoodData().getSaturationLevel() <= 0.0F && this.tickCount % (food * 3 + 1) == 0)
 				y = this.screenHeight - this.rightOffset + this.random.nextInt(3) - 1;
 			
-			int fgOffset = 0;
-			int bgOffset = 0;
-			if (player.hasEffect(MobEffects.HUNGER)) {
-				fgOffset = 36;
-				bgOffset = 13;
-			}
+			boolean hunger = player.hasEffect(MobEffects.HUNGER);
 			
-			graphics.blit(GUI_ICONS_LOCATION, x, y, 16 + bgOffset * 9, 27, 9, 9);
+			graphics.blitSprite(hunger ? FOOD_EMPTY_HUNGER_SPRITE : FOOD_EMPTY_SPRITE, x, y, 9, 9);
 			if (i * 2 + 1 < food)
-				graphics.blit(GUI_ICONS_LOCATION, x, y, fgOffset + 52, 27, 9, 9);
+				graphics.blitSprite(hunger ? FOOD_FULL_HUNGER_SPRITE : FOOD_FULL_SPRITE, x, y, 9, 9);
 			if (i * 2 + 1 == food)
-				graphics.blit(GUI_ICONS_LOCATION, x, y, fgOffset + 61, 27, 9, 9);
+				graphics.blitSprite(hunger ? FOOD_HALF_HUNGER_SPRITE : FOOD_HALF_SPRITE, x, y, 9, 9);
 		}
 		
 		this.rightOffset += 10;
@@ -287,8 +282,8 @@ public class LibhudGui extends Gui {
 			
 			for (int i = 0; i < bubbles + poppedBubbles; ++i)
 				if (i < bubbles)
-					graphics.blit(GUI_ICONS_LOCATION, baseX - i * 8, baseY, 16, 18, 9, 9);
-				else graphics.blit(GUI_ICONS_LOCATION, baseX - i * 8, baseY, 25, 18, 9, 9);
+					graphics.blitSprite(AIR_SPRITE, baseX - i * 8, baseY, 9, 9);
+				else graphics.blitSprite(AIR_BURSTING_SPRITE, baseX - i * 8, baseY, 9, 9);
 			this.rightOffset += 10;
 		}
 		this.minecraft.getProfiler().pop();
@@ -348,8 +343,8 @@ public class LibhudGui extends Gui {
 		int maxHealth = this.getVehicleMaxHearts(vehicle);
 		if (maxHealth == 0) return;
 		
-		this.minecraft.getProfiler().push("mountHealth");
 		int health = (int) Math.ceil(vehicle.getHealth());
+		this.minecraft.getProfiler().push("mountHealth");
 		int baseY = this.screenHeight - this.rightOffset;
 		int baseX = this.screenWidth / 2 + 91;
 		int y = baseY;
@@ -360,11 +355,11 @@ public class LibhudGui extends Gui {
 			
 			for (int j = 0; j < maxRowHealth; j++) {
 				int x = baseX - j * 8 - 9;
-				graphics.blit(GUI_ICONS_LOCATION, x, y, 52, 9, 9, 9);
+				graphics.blitSprite(HEART_VEHICLE_CONTAINER_SPRITE, x, y, 9, 9);
 				if (j * 2 + 1 + i < health)
-					graphics.blit(GUI_ICONS_LOCATION, x, y, 88, 9, 9, 9);
+					graphics.blitSprite(HEART_VEHICLE_FULL_SPRITE, x, y, 9, 9);
 				if (j * 2 + 1 + i == health)
-					graphics.blit(GUI_ICONS_LOCATION, x, y, 97, 9, 9, 9);
+					graphics.blitSprite(HEART_VEHICLE_HALF_SPRITE, x, y, 9, 9);
 			}
 			
 			y -= 10;

@@ -3,7 +3,7 @@ plugins {
 	id 'maven-publish'
 }
 
-version = '1.20-1.0.0-beta6'
+version = '1.20-1.0.0-beta7'
 group = 'dev.cheos'
 base.archivesName = 'libhud-fabric'
 
@@ -21,16 +21,16 @@ repositories {
 }
 
 dependencies {
-	minecraft 'com.mojang:minecraft:1.20.1'
+	minecraft 'com.mojang:minecraft:1.20.2'
 
 	mappings loom.layered() {
 		officialMojangMappings()
 		parchment('org.parchmentmc.data:parchment-1.20.1:2023.06.26@zip')
 	}
 
-	modImplementation 'net.fabricmc:fabric-loader:0.14.22'
+	modImplementation 'net.fabricmc:fabric-loader:0.14.24'
 
-	modCompileOnly 'net.fabricmc.fabric-api:fabric-api:0.88.1+1.20.1'
+	modCompileOnly 'net.fabricmc.fabric-api:fabric-api:0.90.4+1.20.2'
 }
 
 processResources {
